@@ -11,9 +11,11 @@ A PARTICIPANT for Helix can join the cluster as a worker node and respond to the
 
 ## Installation requirements
 
-### Install [Kazoo](https://github.com/python-zk/kazoo) is used to interact with Zookeeper. 
+### Install [Kazoo](https://github.com/python-zk/kazoo). Used to interact with Zookeeper. 
 
-  $ sudo pip install kazoo
+  ```
+   sudo pip install kazoo
+  ```
    
 ### Install future packages for python 2
 
