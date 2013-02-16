@@ -14,7 +14,7 @@ class ExternalView(HelixProperty):
         if len(args) == 1 and isinstance(args[0], str):
             self.__init_resource__(*args)
         elif len(args)==1 and isinstance(args[0], ZNRecord):
-            self.__init__record__(*args)
+            self.__init_record__(*args)
         else:
             raise IllegalArgumentException("Input arguments not supported. args = %s" % args)
     """

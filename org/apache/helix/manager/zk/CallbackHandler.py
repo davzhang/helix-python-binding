@@ -244,9 +244,8 @@ class CallbackHandler():
         if watchChild: 
             try:
                 # List<String>
-                childNames = self._zkClient.getChildren(path)
-                if childNames == None or childNames.size() == 0: 
-                    return
+                childNames = self._zkClient.get_children(path)
+                if not childNames: return
 
                 for childName in childNames: # String
                     childPath = path + "/" + childName
@@ -299,13 +298,13 @@ class CallbackHandler():
 
 
 
-    def handleDataChange(self, data):
+    def handleDataChange(self, data, stat):
         """
         """
         dataPath = self._path
         try:
             self.updateNotificationTime(time.time())
-            if dataPath != None and dataPath.startsWith(self._path):
+            if dataPath != None and dataPath.find(self._path)==0:
                 # NotificationContext
                 changeContext = NotificationContext(self._manager)
                 changeContext.setType(NotificationContext.Type.CALLBACK)

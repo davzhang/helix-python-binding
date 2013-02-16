@@ -4,7 +4,7 @@
 from org.apache.helix.model.ExternalView import ExternalView
 
 
-class ExternalViewChangeListener:
+class ExternalViewChangeListener(object):
 
     def onExternalViewChange(self, externalViewList, changeContext):
         """
