@@ -26,8 +26,17 @@ class ExampleEVListener(ExternalViewChangeListener):
     def getTimeStamp(self):
         return self.externalViewChangeTimeStamp
 
+    def getMachines(self):
+        return self.externalViewChangeTimeStamp
+
     def getEV(self, resourceName):
         resources = self.getResources()
         if resourceName not in resources: return None
         #        return json.dumps(self.externalViewList[resourceName]._record.getMapFields())
         return self.externalViewList[resources.index(resourceName)]._record.getMapFields()
+
+    def getEVAll(self):
+        retDict = {}
+        for ev in self.externalViewList:
+            retDict[ev.getResourceName()] = ev._record.getMapFields()
+        return retDict

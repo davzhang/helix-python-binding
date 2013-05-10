@@ -8,3 +8,4 @@ class IllegalArgumentException(Exception):
     return repr(self.value)
 
 UnsupportedOperationException=IllegalArgumentException
+TimeoutException=IllegalArgumentException

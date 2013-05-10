@@ -6,12 +6,9 @@
 # Annotation: @Retention(RetentionPolicy.RUNTIME)
 
 
-@interface Transition {
-
-
-    String from()
-
-
-    String to()
-}
+class Transition(object):
+    def fromState(self):
+        pass
+    def toState(self):
+        pass
 

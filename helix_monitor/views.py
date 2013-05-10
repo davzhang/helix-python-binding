@@ -8,6 +8,9 @@ def index():
 @app.route('/home')
 def home():
     resource = helixEVListener.getResources()
-    ev =  helixEVListener.getEV(resource[0])
-#    return render_template('index.html', ev = resource )
+#    ev =  helixEVListener.getEV(resource[0])
+    ev =  helixEVListener.getEVAll()
     return render_template('index.html', ev = ev )
+
+#def render_ev(ev):
+#    return render_template('index.html', ev = ev )

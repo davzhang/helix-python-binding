@@ -10,9 +10,11 @@ import re
 
 from org.apache.helix.ConfigScope import ConfigScopeProperty
 from org.apache.helix.HelixException import HelixException
+from org.apache.helix.ZNRecord import ZNRecord
 from org.apache.helix.manager.zk.ZKUtil import ZKUtil
 from org.apache.helix.manager.zk.ZkClient import ZkClient
 from org.apache.helix.util.StringTemplate import StringTemplate
+from org.apache.helix.util.UserExceptions import IllegalArgumentException
 from org.apache.helix.util.logger import get_logger
 #from org.apache.helix.util.UserExceptions import IllegalArgumentException
 
@@ -52,16 +54,30 @@ class ConfigAccessor:
     def __init__(self, zkClient):
         self.zkClient = zkClient
 
+    def get(self, *args):
+        if len(args) == 2 and isinstance(args[1], str):
+            self.get_single(*args)
+        elif len(args) == 2 and isinstance(args[1], list):
+            self.get_list(*args)
+        else:
+            raise IllegalArgumentException("Input arguments not supported. args = %s" % args)
 
-    def get(self, scope, key):
+
+    def get_single(self, scope, key):
         """
         Returns String
         Parameters:
             scope: ConfigScopekey: String
 
-
         """
-        if scope == None or scope.getScope() == None:
+        ret = self.get_list(scope, [key])
+        # not empty dict
+        if ret:
+            return ret[key]
+
+    def get_list(self, scope, keyList):
+
+        if scope is None or scope.getScope() is None:
             self.LOG.error("Scope can't be null")
             return None
 
@@ -72,23 +88,82 @@ class ConfigAccessor:
         if not ZKUtil.isClusterSetup(clusterName, self.zkClient):
             raise HelixException("cluster " + clusterName + " is not setup yet")
 
-
         # String
         scopeStr = scope.getScopeStr()
+        retDict = {}
         # String[]
 #        splits = scopeStr.split("\|")
         splits = re.split("[\\|]", scopeStr)
         # ZNRecord
         record = self.zkClient.readData(splits[0], True)
-        if record != None:
-            if len(splits) == 1:
-                value = record.getSimpleField(key)
-            else:
-                if splits.length == 2:
-                    if record.getMapField(splits[1]) != None:
-                        value = record.getMapField(splits[1]).get(key)
+        if record is not None:
+            for key in keyList:
+                if len(splits) == 1:
+                    value = record.getSimpleField(key)
+                else:
+                    if splits.length == 2:
+                        if record.getMapField(splits[1]) is not None:
+                            value = record.getMapField(splits[1]).get(key)
+            retDict[key] = value
+        return retDict
 
-        return value
+        # return value
+
+    def set(self, *args):
+        if len(args) == 2 and isinstance(args[1], str):
+            self.set_single(*args)
+        elif len(args) == 2 and isinstance(args[1], dict):
+            self.set_list(*args)
+        else:
+            raise IllegalArgumentException("Input arguments not supported. args = %s" % args)
+
+    def set_single(self, scope, key, value):
+        '''
+            Returns void
+            Parameters:
+                scope: ConfigScopekey: Stringvalue: String
+        '''
+        self.set_list(scope, {key:value})
+
+    def set_list(self, scope, key_value_dict):
+       """
+       Returns void
+       Parameters:
+           scope: ConfigScopekey: Stringvalue: String
+
+
+       """
+       import pdb; pdb.set_trace()
+       if scope is None or scope.getScope() is None:
+           self.LOG.error("Scope can't be null")
+           return
+
+       # String
+       clusterName = scope.getClusterName()
+       if not ZKUtil.isClusterSetup(clusterName, self.zkClient):
+           raise HelixException("cluster " + clusterName + " is not setup yet")
+
+
+       # String
+       scopeStr = scope.getScopeStr()
+       # String[]
+       splits = re.split("[\\|]", scopeStr)
+       # String
+       #znodeId = splits[0].substring(splits[0].lastIndexOf('/') + 1)
+       znodeId = splits[0].split('/')[-1]
+       # ZNRecord
+       update = ZNRecord(znodeId)
+       for key, value in key_value_dict.iteritems():
+           if len(splits) == 1:
+               update.setSimpleField(key, value)
+           else:
+               if len(splits) == 2:
+                   if update.getMapField(splits[1]) == None:
+                       update.setMapField(splits[1], {})
+                   update.getMapField(splits[1])[key] = value
+       ZKUtil.createOrUpdate(self.zkClient, splits[0], update, True, True)
+       return
+
 #
 #
 #    def set(self, scope, key, value):
