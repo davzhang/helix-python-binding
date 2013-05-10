@@ -133,7 +133,6 @@ class ConfigAccessor:
 
 
        """
-       import pdb; pdb.set_trace()
        if scope is None or scope.getScope() is None:
            self.LOG.error("Scope can't be null")
            return

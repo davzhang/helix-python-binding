@@ -23,17 +23,17 @@ class TestHelixAgent(unittest.TestCase):
         # clusterName = "%s_%s" % (self.__class__name__, sys._getframe(1).f_code.co_name )  # class name, function name
         clusterName = "testCluster"  # class name, function name
 
-#        TestHelper.setupCluster(clusterName,
-#                                zkAddr,
-#                            12918, # participant port
-#                            "localhost", # participant name prefix
-#                            "TestDB", # resource name prefix
-#                            1, # resources
-#                            1, # partitions per resource
-#                            numberofNodes, # number of nodes
-#                            1, # replicas
-#                            "MasterSlave",
-#                            True) # do rebalance
+        TestHelper.setupCluster(clusterName,
+                                zkAddr,
+                            12918, # participant port
+                            "localhost", # participant name prefix
+                            "TestDB", # resource name prefix
+                            1, # resources
+                            1, # partitions per resource
+                            numberofNodes, # number of nodes
+                            1, # replicas
+                            "MasterSlave",
+                            True) # do rebalance
 
         # setup the config
 #        import pdb; pdb.set_trace()
