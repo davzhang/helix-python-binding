@@ -149,7 +149,7 @@ class HelixTask():
             timer.cancel()
 
         if taskResult.isSucess(): 
-            self._statusUpdateUtil.logInfo(self._message, self._handler.getClass(), "Message handling task completed successfully", accessor)
+            self._statusUpdateUtil.logInfo(self._message, self._handler.__class__, "Message handling task completed successfully", accessor)
             self.logger.info("Message " + self._message.getMsgId() + " completed.")
         else:
             if taskResult.isInterrupted(): 
@@ -159,7 +159,7 @@ class HelixTask():
                     # int
                     retryCount = self._message.getRetryCount()
                     self.logger.info("Message timeout, retry count: " + retryCount + " MSGID:" + self._message.getMsgId())
-                    self._statusUpdateUtil.logInfo(self._message, self._handler.getClass(), "Message handling task timeout, retryCount:" + retryCount, accessor)
+                    self._statusUpdateUtil.logInfo(self._message, self._handler.__class__, "Message handling task timeout, retryCount:" + retryCount, accessor)
                     if retryCount > 0: 
                         self._message.setRetryCount(retryCount - 1)
                         self._executor.scheduleTask(self._message, self._handler, self._notificationContext)
@@ -169,7 +169,7 @@ class HelixTask():
             else:
                 # String
                 errorMsg = "Message execution failed. msgId: " + self._message.getMsgId() + taskResult.getMessage()
-                if exception != None: 
+                if exception is not None:
                     errorMsg += exception
 
                 self.logger.error(errorMsg+ str(exception))
@@ -183,7 +183,7 @@ class HelixTask():
             else:
                 # GroupMessageInfo
                 info = self._executor._groupMsgHandler.onCompleteSubMessage(self._message)
-                if info != None: 
+                if info is not None:
                     # Map<PropertyKey, CurrentState>
                     curStateMap = info.merge()
                     for key in curStateMap.keys():
@@ -195,9 +195,9 @@ class HelixTask():
 
 
             self._executor.reportCompletion(self._message)
-        except KeyboardInterrupt, e:
+        # except KeyboardInterrupt, e:
         #TODO: should we print the error
-#        except Exception, e:
+        except Exception as e:
             # String
             errorMessage = "Exception after executing a message, msgId: " + self._message.getMsgId() + e
             self.logger.error(errorMessage+ str(e))
@@ -210,7 +210,7 @@ class HelixTask():
                 end = time.time()
 #                end = System.currentTimeMillis()
                 self.logger.info("msg:" + self._message.getMsgId() + " handling task completed, results:" + str(taskResult.isSucess()) + ", at: " + str(end) + ", took:" + str(end - start))
-                if exception != None: 
+                if exception is not None:
                     self._handler.onError(exception, code, type)
 
 
@@ -228,7 +228,7 @@ class HelixTask():
         """
         # Builder
         keyBuilder = accessor.keyBuilder()
-        if message.getTgtName().equalsIgnoreCase("controller"): 
+        if message.getTgtName().lower() == "controller":
             accessor.removeProperty(keyBuilder.controllerMessage(message.getMsgId()))
         else:
             accessor.removeProperty(keyBuilder.message(self._manager.getInstanceName(), message.getMsgId()))

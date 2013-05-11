@@ -294,7 +294,7 @@ class HelixTaskExecutor(MessageListener):
         self._lock.acquire()
         try:
             taskId = message.getMsgId() + "/" + message.getPartitionName()
-            self.LOG.info("message finished: " + taskId + ", took " + (time.time() - message.getExecuteStartTimeStamp()))
+            self.LOG.info("message finished: " + taskId + ", took " + str(time.time() - float(message.getExecuteStartTimeStamp())))
             if self._taskMap.__contains__(taskId):
                 self._taskMap.pop(taskId)
             else:

@@ -52,17 +52,18 @@ class ExternalCommand(object):
         os.chdir(workingDir)
         # return os.system(cmds)
         #print "cmds = %s" % cmds
-        subProc = subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+        subProc = subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True, shell=True)
         slept = 0
         sleepInterval = 1
         while (timeoutValue == 0 or slept < timeoutValue):
-          if subProc.poll() != None: break
-          time.sleep(sleepInterval)
-          slept += sleepInterval
-        if (slept >= timeoutValue):
-          subProc.kill()
-          time.sleep(1)
-          raise TimeoutException, "cmd = %s" % cmd
-        elif (subProc.returncode != 0):
+            if subProc.poll() is not None:
+                break
+            time.sleep(sleepInterval)
+            slept += sleepInterval
+        if slept >= timeoutValue and timeoutValue >0:
+            subProc.kill()
+            time.sleep(1)
+            raise TimeoutException("cmd = %s" % cmd)
+        elif subProc.returncode != 0:
             print "OUTPUT=\n" + "".join(subProc.stdout.readlines())
             return subProc.returncode

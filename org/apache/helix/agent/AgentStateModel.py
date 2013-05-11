@@ -7,6 +7,7 @@
 #from java.util.regex import Matcher
 #from java.util.regex import Pattern
 #from org.apache.helix import ExternalCommand
+import time
 from org.apache.helix import HelixManager
 from org.apache.helix import NotificationContext
 #from org.apache.helix.model import HelixConfigScope
@@ -97,6 +98,8 @@ class AgentStateModel(StateModel):
         clusterName = manager.getClusterName()
         fromState = message.getFromState()
         toState = message.getToState()
+        self.logger.info("AgentStateModel.onBecome " + fromState + " From " + toState + " for " + message.getResourceName())
+
         cmdKey = self.buildKey(fromState, toState, CommandAttribute.COMMAND)
         workingDirKey = self.buildKey(fromState, toState, CommandAttribute.WORKING_DIR)
         timeoutKey = self.buildKey(fromState, toState, CommandAttribute.TIMEOUT)
@@ -169,18 +172,23 @@ class AgentStateModel(StateModel):
             ProcessMonitorThread(pid).start()
 
     def onBecomeSlaveFromOffline(self, message, context):
+        # self.logger.info("AgentStateModel.onBecomeSlaveFromOffline() for " + self.stateUnitKey)
         self.genericStateTransitionHandler(message, context)
 
     def onBecomeSlaveFromMaster(self, message, context):
+        # self.logger.info("AgentStateModel.onBecomeSlaveFromMaster() for " + self.stateUnitKey)
         self.genericStateTransitionHandler(message, context)
 
     def onBecomeMasterFromSlave(self, message, context):
+        # self.logger.info("AgentStateModel.onBecomeMasterFromSlave() for " + self.stateUnitKey)
         self.genericStateTransitionHandler(message, context)
 
     def onBecomeOfflineFromSlave(self, message, context):
+        # self.logger.info("AgentStateModel.onBecomeOfflineFromSlave() for " + self.stateUnitKey)
         self.genericStateTransitionHandler(message, context)
 
     def onBecomeDroppedFromOffline(self, message, context):
+        # self.logger.info("AgentStateModel.onBecomeDroppedFromOffline() for " + self.stateUnitKey)
         self.genericStateTransitionHandler(message, context)
 
 

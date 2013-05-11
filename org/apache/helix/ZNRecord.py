@@ -63,16 +63,16 @@ class ZNRecord:
     SIZE_LIMIT = 1000 * 1024
 
     def __init__(self, *args):
-        if len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0],unicode)):
+        if len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0], unicode)):
             self.__init_id__(args[0])
         elif len(args) == 1 and isinstance(args[0], ZNRecord):
             self.__init_record__(args[0])
-        elif len(args) == 2 and isinstance(args[0],ZNRecord) and (isinstance(args[1],str) or isinstance(args[1], unicode)):
+        elif len(args) == 2 and isinstance(args[0],ZNRecord) and (isinstance(args[1], str) or isinstance(args[1], unicode)):
             self.__init_record_id__(self, *args)
-        elif len(args) == 2 and isinstance(args[0],ZNRecord) and isinstance(args[1],int):
+        elif len(args) == 2 and isinstance(args[0],ZNRecord) and isinstance(args[1], int):
             self.__init_record_version__(self, *args)
         else:
-            raise IllegalArgumentException("Input arguments not supported. args = %s" % args)
+            raise IllegalArgumentException("Input arguments not supported. args = %s" % list(args))
 
     """
     @JsonCreator

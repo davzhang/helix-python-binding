@@ -58,14 +58,14 @@ class Message(HelixProperty):
     CREATE_TIME_COMPARATOR = compare
 
     def __init__(self, *args):
-        if len(args)==2 and isinstance(args[1], str):
+        if len(args) == 2 and (isinstance(args[1], str) or isinstance(args[1], unicode)):
             self.__init__type_msgId(*args)
-        elif len(args)==1 and isinstance(args[0], ZNRecord):
+        elif len(args) == 1 and isinstance(args[0], ZNRecord):
             self.__init__record(*args)
-        elif len(args)==2 and isinstance(args[0], ZNRecord):
+        elif len(args) == 2 and isinstance(args[0], ZNRecord):
             self.__init__record_id(*args)
         else:
-            raise IllegalArgumentException("Input arguments not supported. args = %s" % args)
+            raise IllegalArgumentException("Input arguments not supported. args = %s" % list(args))
 
 
     """

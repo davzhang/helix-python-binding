@@ -141,9 +141,9 @@ class ZkBaseDataAccessor(BaseDataAccessor):
     def set(self, *args):
         if len(args) == 3:
             return self.set_path(args[0], args[1], None, None, -1, args[2])
-        elif len(args)==5 and isinstance(args[0],list):
+        elif len(args)==5 and isinstance(args[0], list):
             return self.set_paths(*args)
-        elif len(args)==6 and isinstance(args[0],str):
+        elif len(args)==6 and isinstance(args[0], str) or isinstance(args[0], unicode):
             return self.set_path(*args)
         else:
             raise IllegalArgumentException("Wrong args: %s" % args)
@@ -212,12 +212,12 @@ class ZkBaseDataAccessor(BaseDataAccessor):
     def update(self, *args):
         if len(args) == 3:
             return self.update_path(args[0], args[1], None, None, args[2])
-        elif len(args) == 5 and isinstance(args[0], str):
+        elif len(args) == 5 and (isinstance(args[0], str) or isinstance(args[0], unicode)):
             return self.update_path(*args)
         elif len(args) == 5 and isinstance(args[0], list):
             return self.update_paths(*args)
         else:
-            raise IllegalArgumentException("Wrong args: %s" % args)
+            raise IllegalArgumentException("Wrong args: %s" % list(args))
 
 #    def update(self, path, updater, options):
 #        """
@@ -515,12 +515,12 @@ class ZkBaseDataAccessor(BaseDataAccessor):
         return self._zkClient.getStat(path)
 
     def remove(self, *args):
-        if len(args)==2 and isinstance(args[0], str):
+        if len(args) == 2 and (isinstance(args[0], str) or isinstance(args[0], unicode)):
             return self.remove_path(*args)
-        elif len(args)==2 and isinstance(args[0], list):
+        elif len(args) == 2 and isinstance(args[0], list):
             return self.remove_paths(*args)
         else:
-            raise IllegalArgumentException("Wrong args: %s" % args)
+            raise IllegalArgumentException("Wrong args: %s" % list(args))
 
     def remove_path(self, path, options):
         """

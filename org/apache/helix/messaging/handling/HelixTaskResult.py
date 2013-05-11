@@ -7,6 +7,13 @@
 class HelixTaskResult:
 
 
+    def __init__(self):
+        self._success = False
+        self._message = ""
+        self._taskResultMap = {}
+        self._interrupted = False
+        self._exception = None
+
     def isSucess(self):
         """
         Returns boolean
@@ -84,7 +91,7 @@ class HelixTaskResult:
 
 
         """
-        _exception = e
+        self._exception = e
 
 
     def getException(self):

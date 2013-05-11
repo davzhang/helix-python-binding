@@ -163,7 +163,7 @@ class HelixStateMachineEngine(StateMachineEngine):
                     stateModel = modelMap.get(resourceKey)
                     stateModel.reset()
                     # String
-                    initialState = self._stateModelParser.getInitialState(stateModel.getClass())
+                    initialState = self._stateModelParser.getInitialState(stateModel.__class__)
                     stateModel.updateState(initialState)
 
 

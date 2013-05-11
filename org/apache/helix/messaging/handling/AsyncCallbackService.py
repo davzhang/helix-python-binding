@@ -112,7 +112,7 @@ class AsyncCallbackService(MessageHandlerFactory):
 
 
         """
-        if not message.getMsgType().toString().equalsIgnoreCase(MessageType.TASK_REPLY.toString()): 
+        if not message.getMsgType().toString().upper() == MessageType.TASK_REPLY.toString().upper():
             # String
             errorMsg = "Unexpected msg type for message " + message.getMsgId() + " type:" + message.getMsgType() + " Expected : " + MessageType.TASK_REPLY
             self._logger.error(errorMsg)

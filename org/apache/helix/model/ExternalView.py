@@ -11,12 +11,12 @@ from org.apache.helix.util.UserExceptions import IllegalArgumentException
 class ExternalView(HelixProperty):
 
     def __init__(self, *args):
-        if len(args) == 1 and isinstance(args[0], str):
+        if len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0], unicode)):
             self.__init_resource__(*args)
-        elif len(args)==1 and isinstance(args[0], ZNRecord):
+        elif len(args) == 1 and isinstance(args[0], ZNRecord):
             self.__init_record__(*args)
         else:
-            raise IllegalArgumentException("Input arguments not supported. args = %s" % args)
+            raise IllegalArgumentException("Input arguments not supported. args = %s" % list(args))
     """
 
     Parameters:

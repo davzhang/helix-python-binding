@@ -142,7 +142,7 @@ class HelixStateTransitionHandler(MessageHandler):
             # String
             toState = message.getToState()
             self._currentStateDelta.setState(partitionKey, toState)
-            if toState.equalsIgnoreCase("DROPPED"):
+            if toState.upper() == "DROPPED":
                 # ZNRecordDelta
                 delta = ZNRecordDelta(self._currentStateDelta.getRecord(), MergeOperation.SUBTRACT)
                 delta._record.getSimpleFields().clear()

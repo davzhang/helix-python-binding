@@ -55,12 +55,12 @@ class ConfigAccessor:
         self.zkClient = zkClient
 
     def get(self, *args):
-        if len(args) == 2 and isinstance(args[1], str):
+        if len(args) == 2 and (isinstance(args[1], str) or isinstance(args[1], unicode)):
             return self.get_single(*args)
         elif len(args) == 2 and isinstance(args[1], list):
             return self.get_list(*args)
         else:
-            raise IllegalArgumentException("Input arguments not supported. args = %s" % args)
+            raise IllegalArgumentException("Input arguments not supported. args = %s" % list(args))
 
 
     def get_single(self, scope, key):
@@ -110,12 +110,12 @@ class ConfigAccessor:
         # return value
 
     def set(self, *args):
-        if len(args) == 2 and isinstance(args[1], str):
+        if len(args) == 2 and (isinstance(args[1], str) or isinstance(args[1], unicode)):
             self.set_single(*args)
         elif len(args) == 2 and isinstance(args[1], dict):
             self.set_list(*args)
         else:
-            raise IllegalArgumentException("Input arguments not supported. args = %s" % args)
+            raise IllegalArgumentException("Input arguments not supported. args = %s" % list(args))
 
     def set_single(self, scope, key, value):
         '''
