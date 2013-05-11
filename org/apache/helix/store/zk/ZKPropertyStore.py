@@ -17,6 +17,7 @@
 #from org.apache.zookeeper.Watcher.Event import KeeperState
 #from org.apache.zookeeper import ZooKeeper
 #from org.apache.zookeeper.data import Stat
+from ImageStat import Stat
 from org.apache.helix.manager.zk.ZkClient import ZkClient
 from org.apache.helix.store.PropertyChangeListener import PropertyChangeListener
 from org.apache.helix.store.PropertySerializer import PropertySerializer

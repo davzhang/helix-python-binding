@@ -600,12 +600,9 @@ class ZkBaseDataAccessor(BaseDataAccessor):
                     if cb.isSuccessful() and pathsCreated != None:
                         if pathsCreated[i] == None:
                             pathsCreated[i] = []
+                        pathsCreated[i].add(path)
 
-                        pathsCreated.get(i).add(path)
-
-
-
-            if failOnNoNode: 
+            if failOnNoNode:
                 # boolean[]
 #                needCreateParent = Arrays.copyOf(needCreate, needCreate.length)
                 needCreateParent = [x for x in needCreate]

@@ -9,7 +9,7 @@
 #from org.apache.commons.cli import OptionBuilder
 #from org.apache.commons.cli import Options
 #from org.apache.commons.cli import ParseException
-#from org.apache.helix import HelixManager
+#from org.apache.helix.HelixManager import HelixManager
 #from org.apache.helix import InstanceType
 #from org.apache.helix.manager.zk import ZKHelixManager
 #from org.apache.helix.participant import StateMachineEngine
@@ -18,6 +18,7 @@ from optparse import OptionParser
 import threading
 import sys
 from org.apache.helix.HelixManagerFactory import HelixManagerFactory
+from org.apache.helix.InstanceType import InstanceType
 from org.apache.helix.agent.AgentStateModelFactory import AgentStateModelFactory
 
 from org.apache.helix.util.logger import get_logger
@@ -173,9 +174,9 @@ def main(args):
 
     # StateMachineEngine
 
-    stateMach = manager.getStateMachineEngine();
-    stateMach.registerStateModelFactory(stateModelName, AgentStateModelFactory());
-    # Runtime.getRuntime().addShutdownHook(HelixAgentShutdownHook(manager));
+    stateMach = manager.getStateMachineEngine()
+    stateMach.registerStateModelFactory(stateModelName, AgentStateModelFactory())
+    # Runtime.getRuntime().addShutdownHook(HelixAgentShutdownHook(manager))
     manager.connect()
 
     # try:
@@ -187,7 +188,7 @@ def main(args):
     #         if manager != None && manager.isConnected():
     #             manager.disconnect();
 
-
+    # TODO: join here OK?
     for thread in threading.enumerate():
         if thread is not threading.currentThread():
             thread.join()

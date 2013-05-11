@@ -9,6 +9,9 @@ from org.apache.helix.agent.CommandAttribute import CommandAttribute
 from org.apache.helix.agent.CommandConfig import CommandConfig
 from org.apache.helix.agent import HelixAgentMain   # import the file
 from org.apache.helix.agent.SystemUtil import SystemUtil
+from org.apache.helix.manager.zk.ByteArraySerializer import ByteArraySerializer
+from org.apache.helix.manager.zk.ChainedPathZkSerializer import ChainedPathZkSerializer
+from org.apache.helix.manager.zk.ZNRecordStreamingSerializer import ZNRecordStreamingSerializer
 from org.apache.helix.manager.zk.ZkClient import ZkClient
 from org.apache.helix.test.TestHelper import TestHelper
 
@@ -37,7 +40,10 @@ class TestHelixAgent(unittest.TestCase):
 
         # setup the config
 #        import pdb; pdb.set_trace()
-        client = ZkClient(zkAddr)
+        # set the ZNRecord Serializer
+        zkSerializer = ChainedPathZkSerializer.builder(ZNRecordStreamingSerializer()).serialize("/", ByteArraySerializer()).build()
+        client = ZkClient(zkAddr, zkSerializer=zkSerializer)
+
         scope = ConfigScopeBuilder().forCluster(clusterName).build()
         configAccessor = ConfigAccessor(client)
         workingDir = "/tmp"
@@ -58,21 +64,26 @@ class TestHelixAgent(unittest.TestCase):
 
         for (fromState, toState) in (("OFFLINE", "SLAVE"), ("MASTER", "SLAVE"), ("SLAVE", "OFFLINE"), ("OFFLINE", "DROP")):
             builder = CommandConfig.Builder()
-            cmdConfig = builder.setTransition("OFFLINE", "SLAVE") \
-                            .setCommand(CommandAttribute.NOP.getName())
+            cmdConfig = builder.setTransition(fromState, toState) \
+                            .setCommand(CommandAttribute.NOP.getName()) \
+                            .build()
             configAccessor.set(scope, cmdConfig.toKeyValueMap())
 
         TestHelper.startController(clusterName,
                                 zkAddr)
 
+        agentArgs = ["--zkAddr", zkAddr, "--cluster", clusterName,
+                      "--instanceName", "localhost_12918", "--stateModel", "MasterSlave"]
+        print " ".join(agentArgs)
         # start Helix-agent
         class AgentThread(threading.Thread):
             def __init__(self, instanceName):
                 threading.Thread.__init__(self)
                 self._instanceName = instanceName
             def run(self):
-                HelixAgentMain.main(["--zkSvr", zkAddr, "--cluster", clusterName,
-                "--instanceName", self._instanceName, "--stateModel", "MasterSlave"])
+                agentArgs = ["--zkSvr", zkAddr, "--cluster", clusterName,
+                         "--instanceName", self._instanceName, "--stateModel", "MasterSlave"]
+                HelixAgentMain.main(agentArgs)
         agentThreads=[]
         for i in range(numberofNodes):
             instanceName = "localhost_" + str(12918 + i)
@@ -80,6 +91,8 @@ class TestHelixAgent(unittest.TestCase):
             agentThreads.append(agentThread)
             agentThread.start()
 
+        for agentThread in agentThreads:
+            agentThread.join()
         # self.assertTrue(True)
         # read pid
         readPid = SystemUtil.getPidFromFile(pidFileFirstPartition)

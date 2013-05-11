@@ -36,6 +36,12 @@ class CommandConfig:
 
 
     class Builder:
+        fromState = None
+        toState = None
+        command = None
+        workingDir = None
+        timeout = None
+        pidFile = None
 
         def setTransition(self, fromState, toState):
             """
@@ -45,8 +51,8 @@ class CommandConfig:
 
 
             """
-            self._fromState = fromState
-            self._toState = toState
+            CommandConfig.Builder.fromState = fromState
+            CommandConfig.Builder.toState = toState
             return self
 
 
@@ -58,7 +64,7 @@ class CommandConfig:
 
 
             """
-            self._command = command
+            CommandConfig.Builder.command = command
             return self
 
 
@@ -70,7 +76,7 @@ class CommandConfig:
 
 
             """
-            self._workingDir = workingDir
+            CommandConfig.Builder.workingDir = workingDir
             return self
 
 
@@ -82,7 +88,7 @@ class CommandConfig:
 
 
             """
-            self._timeout = timeout
+            CommandConfig.Builder.timeout = timeout
             return self
 
 
@@ -94,7 +100,7 @@ class CommandConfig:
 
 
             """
-            self._pidFile = pidFile
+            CommandConfig.Builder.pidFile = pidFile
             return self
 
 
@@ -104,7 +110,9 @@ class CommandConfig:
 
 
             """
-            return CommandConfig(self._fromState, self._toState, self._command, self._workingDir, self._timeout, self._pidFile)
+            return CommandConfig(CommandConfig.Builder.fromState, CommandConfig.Builder.toState,
+                                 CommandConfig.Builder.command, CommandConfig.Builder.workingDir,
+                                 CommandConfig.Builder.timeout, CommandConfig.Builder.pidFile)
 
 
 

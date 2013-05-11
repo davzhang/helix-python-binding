@@ -7,10 +7,13 @@
 #from org.apache.log4j import Logger
 #from org.apache.zookeeper import CreateMode
 #from org.apache.zookeeper.data import Stat
+from ImageStat import Stat
 from org.apache.helix.ConfigScope import ConfigScopeProperty
 from org.apache.helix.PropertyPathConfig import PropertyPathConfig
 from org.apache.helix.PropertyType import PropertyType
 from org.apache.helix.ZNRecord import ZNRecord
+from org.apache.helix.util.ZKConstants import HelixZNodeStat
+
 
 from org.apache.helix.util.logger import get_logger
 class ZKUtil:
@@ -66,6 +69,32 @@ class ZKUtil:
             and  zkClient.exists(PropertyPathConfig.getPath(PropertyType.STATUSUPDATES_CONTROLLER, clusterName)) \
             and  zkClient.exists(PropertyPathConfig.getPath(PropertyType.HISTORY, clusterName))
         return isValid
+
+    @staticmethod
+    def createOrUpdate(client, path, record, persistent, mergeOnUpdate):
+        """
+        Returns void
+        Parameters:
+            client: ZkClientpath: Stringrecord: ZNRecordpersistent: booleanmergeOnUpdate: boolean
+        Java modifiers:
+             static
+
+        """
+        # int
+        retryCount = 0
+        while retryCount < ZKUtil.RETRYLIMIT:
+            try:
+                if not client.exists(path):
+                    client.createPersistent(path, True)
+                stat = HelixZNodeStat()
+                currentRecord = client.readDataAndStat(path, stat, True)
+                if currentRecord is not None and mergeOnUpdate:
+                    currentRecord.merge(record)
+                client.writeData(path, currentRecord, stat.getVersion())
+                break
+            except Exception as e:
+                retryCount = retryCount + 1
+                ZKUtil.logger.warn("Exception trying to update " + path + " Exception:" + str(e) + ". Will retry.")
 
 
 #    def createChildren(client, parentPath, list):
@@ -199,56 +228,6 @@ class ZKUtil:
 #
 #
 #
-#    def createOrUpdate(client, path, record, persistent, mergeOnUpdate):
-#        """
-#        Returns void
-#        Parameters:
-#            client: ZkClientpath: Stringrecord: ZNRecordpersistent: booleanmergeOnUpdate: boolean
-#        Java modifiers:
-#             static
-#
-#        """
-#        # int
-#        retryCount = 0
-#        while (retryCount < RETRYLIMIT:
-#            try:
-#                if client.exists(path):
-#                    # DataUpdater<ZNRecord>
-#                    updater = DataUpdater<ZNRecord>() {
-#
-#                        def update(self, currentData):
-#                            """
-#                            Returns ZNRecord
-#                            Parameters:
-#                                currentData: ZNRecord
-#                            @Override
-#
-#
-#                            """
-#                            if currentData != None && mergeOnUpdate:
-#                                currentData.merge(record)
-#                                return currentData
-#
-#                            return record
-#
-#                    }
-#                    client.updateDataSerialized(path, updater)
-#                else:
-#                    # CreateMode
-#                    mode = java2python_runtime.ternary((persistent), CreateMode.PERSISTENT, CreateMode.EPHEMERAL)
-#                    if record.getDeltaList().size() > 0:
-#                        # ZNRecord
-#                        value = ZNRecord(record.getId())
-#                        value.merge(record)
-#                        client.create(path, value, mode)
-#                    else:
-#                        client.create(path, record, mode)
-#
-#
-#                break
-#            except Exception, e:
-#                retryCount = retryCount + 1
-#                logger.warn("Exception trying to update " + path + " Exception:" + e.getMessage() + ". Will retry.")
 #
 #
 #

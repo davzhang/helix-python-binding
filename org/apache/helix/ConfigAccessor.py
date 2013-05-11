@@ -56,9 +56,9 @@ class ConfigAccessor:
 
     def get(self, *args):
         if len(args) == 2 and isinstance(args[1], str):
-            self.get_single(*args)
+            return self.get_single(*args)
         elif len(args) == 2 and isinstance(args[1], list):
-            self.get_list(*args)
+            return self.get_list(*args)
         else:
             raise IllegalArgumentException("Input arguments not supported. args = %s" % args)
 
@@ -104,7 +104,7 @@ class ConfigAccessor:
                     if splits.length == 2:
                         if record.getMapField(splits[1]) is not None:
                             value = record.getMapField(splits[1]).get(key)
-            retDict[key] = value
+                retDict[key] = value
         return retDict
 
         # return value

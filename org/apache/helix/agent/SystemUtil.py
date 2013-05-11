@@ -43,7 +43,7 @@ class SystemUtil(object):
 
     logger = get_logger(__name__)
 
-
+    @staticmethod
     def getProcessState(processId):
         """
         Returns ProcessStateCode
@@ -80,7 +80,7 @@ class SystemUtil(object):
         else:
             raise ("Not supported OS: " + SystemUtil.OS_NAME)
 
-
+    @staticmethod
     def getPidFromFile(file):
         try:
             with open(file) as pidFile:

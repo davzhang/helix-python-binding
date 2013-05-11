@@ -45,6 +45,7 @@ class AgentStateModel(StateModel):
     """
     pattern = re.compile("({.+?})")
 
+    @staticmethod
     def buildKey(fromState, toState, attribute):
         """
         Returns String
@@ -56,7 +57,7 @@ class AgentStateModel(StateModel):
         """
         return fromState + "-" + toState + "." + attribute.getName()
 
-
+    @staticmethod
     def instantiateByMessage(template, message):
         """
         Returns String
@@ -105,7 +106,7 @@ class AgentStateModel(StateModel):
         if cmd is None:
             # HelixConfigScope
             # resourceScope = HelixConfigScopeBuilder(ConfigScopeProperty.RESOURCE).forCluster(clusterName).forResource(message.getResourceName()).build()
-            resourceScope = ConfigScopeBuilder(ConfigScopeProperty.RESOURCE).forCluster(clusterName).forResource(message.getResourceName()).build()
+            resourceScope = ConfigScopeBuilder().forCluster(clusterName).forResource(message.getResourceName()).build()
             # Map<String, String>
             cmdKeyValueMap = manager.getConfigAccessor().get(resourceScope, cmdConfigKeys)
             if cmdKeyValueMap is not None:
@@ -118,7 +119,7 @@ class AgentStateModel(StateModel):
         if cmd is None:
             # HelixConfigScope
             # clusterScope = HelixConfigScopeBuilder(ConfigScopeProperty.CLUSTER).forCluster(clusterName).build()
-            clusterScope = ConfigScopeBuilder(ConfigScopeProperty.CLUSTER).forCluster(clusterName).build()
+            clusterScope = ConfigScopeBuilder().forCluster(clusterName).build()
             # Map<String, String>
             cmdKeyValueMap = manager.getConfigAccessor().get(clusterScope, cmdConfigKeys)
             if cmdKeyValueMap is not None:
@@ -131,7 +132,7 @@ class AgentStateModel(StateModel):
         if cmd is None:
             raise Exception("Unable to find command for transition from:" + message.getFromState() + " to:" + message.getToState())
 
-        self._logger.info("Executing command: " + cmd + ", using workingDir: " + workingDir + ", timeout: " + timeout + ", on " + manager.getInstanceName())
+        self.logger.info("Executing command: " + cmd + ", using workingDir: " + str(workingDir) + ", timeout: " + str(timeout) + ", on " + str(manager.getInstanceName()))
         if cmd == CommandAttribute.NOP.getName():
             return
 
@@ -153,9 +154,9 @@ class AgentStateModel(StateModel):
         externalCmd = ExternalCommand.executeWithTimeout(workingDir, cmdValue, timeoutValue, args)
         # int
         exitValue = externalCmd.exitValue()
-        self._logger.info("Executed command: " + cmd + ", exitValue: " + exitValue)
+        self.logger.info("Executed command: " + cmd + ", exitValue: " + str(exitValue))
         if exitValue != 0: 
-            raise Exception("fail to execute command: " + cmd + ", exitValue: " + exitValue + ", error: " + externalCmd.getStringError())
+            raise Exception("fail to execute command: " + cmd + ", exitValue: " + str(exitValue) + ", error: " + externalCmd.getStringError())
 
         if pidFile is not None:
             return
@@ -164,8 +165,23 @@ class AgentStateModel(StateModel):
         pidFileValue = self.instantiateByMessage(pidFile, message)
         # String
         pid = SystemUtil.getPidFromFile(pidFileValue)
-        if pid != None: 
+        if pid is not None:
             ProcessMonitorThread(pid).start()
+
+    def onBecomeSlaveFromOffline(self, message, context):
+        self.genericStateTransitionHandler(message, context)
+
+    def onBecomeSlaveFromMaster(self, message, context):
+        self.genericStateTransitionHandler(message, context)
+
+    def onBecomeMasterFromSlave(self, message, context):
+        self.genericStateTransitionHandler(message, context)
+
+    def onBecomeOfflineFromSlave(self, message, context):
+        self.genericStateTransitionHandler(message, context)
+
+    def onBecomeDroppedFromOffline(self, message, context):
+        self.genericStateTransitionHandler(message, context)
 
 
 

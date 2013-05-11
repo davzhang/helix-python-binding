@@ -19,8 +19,10 @@ import sys
 import traceback
 from kazoo.exceptions import NoNodeException, NodeExistsError, NodeExistsException
 import os
+from org.apache.helix.manager.zk import ChainedPathZkSerializer
 from org.apache.helix.manager.zk.BasicZkSerializer import BasicZkSerializer
 from org.apache.helix.manager.zk.ByteArraySerializer import ByteArraySerializer
+from org.apache.helix.manager.zk.ZNRecordStreamingSerializer import ZNRecordStreamingSerializer
 from org.apache.helix.manager.zk.ZkAsyncCallbacks import CreateCallbackHandler
 from org.apache.helix.manager.zk.ZkAsyncCallbacks import DeleteCallbackHandler
 from org.apache.helix.manager.zk.ZkAsyncCallbacks import ExistsCallbackHandler
@@ -38,6 +40,9 @@ from org.apache.helix.util.ZKConstants import HelixZNodeStat
 from org.apache.helix.util.misc import ternary
 
 #class ZkClient(KazooClient):
+'''
+ ZkClient is operating on ZNRecord
+'''
 class ZkClient():
 
 
@@ -123,12 +128,14 @@ class ZkClient():
         int connectionTimeout
         PathBasedZkSerializer zkSerializer
     """
+    # DEFAULT_ZK_SERIALIZER = ChainedPathZkSerializer.builder(ZNRecordStreamingSerializer()).serialize(propertyStorePath, ByteArraySerializer()).build()
     # TODO: more serilizer?
     def __init__(self, zkServers, sessionTimeout=DEFAULT_SESSION_TIMEOUT, connectionTimeout=DEFAULT_CONNECTION_TIMEOUT, zkSerializer=BasicZkSerializer):
         self._connection = KazooClient(hosts=zkServers, timeout=sessionTimeout)
         self._zkSerializer = zkSerializer
         self._connection.start(connectionTimeout)
         self.LOG.info("create a new zkclient. " + repr(traceback.extract_stack()))
+
 #        this(ZkConnection(zkServers, sessionTimeout), connectionTimeout, zkSerializer)
 #
 #
@@ -462,7 +469,8 @@ class ZkClient():
 
 
         """
-        self._connection.set(path, data, expectedVersion)
+        bytes = self._zkSerializer.serialize(data, path)
+        self._connection.set(path, bytes, expectedVersion)
 #        # long
 #        startT = System.nanoTime()
 #        try:
