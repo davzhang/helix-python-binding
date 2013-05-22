@@ -39,7 +39,6 @@ class TestHelixAgent(unittest.TestCase):
                             True) # do rebalance
 
         # setup the config
-#        import pdb; pdb.set_trace()
         # set the ZNRecord Serializer
         zkSerializer = ChainedPathZkSerializer.builder(ZNRecordStreamingSerializer()).serialize("/", ByteArraySerializer()).build()
         client = ZkClient(zkAddr, zkSerializer=zkSerializer)
